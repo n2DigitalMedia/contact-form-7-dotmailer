@@ -1,2 +1,2 @@
-contactform7-dotmailer
+Contact Form 7 Dotmailer Plugin
 ======================
