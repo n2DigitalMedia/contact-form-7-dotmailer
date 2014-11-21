@@ -275,7 +275,7 @@ final class DMCF7PLUGIN {
 			$dm_username = $dm_settings["dotmailer_username"];
         	$dm_password = $dm_settings["dotmailer_password"];
 
-        	$dm_connection = new DotMailerConnect($dm_username,$dm_password);
+        	$dm_connection = new N2CF7_DotMailerConnect($dm_username,$dm_password);
 
 		    if(isset($dm_connection)){
 		    	

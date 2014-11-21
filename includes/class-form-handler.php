@@ -37,11 +37,15 @@ class N2DMCF7_Form_Handler {
 
         $params = array('username' => $this->dm_username, 'password' => $this->dm_password);
         
-        $this->dm_client = new DotMailerConnect($this->dm_username, $this->dm_password);
+        $this->dm_client = new N2CF7_DotMailerConnect($this->dm_username, $this->dm_password);
 
         
     }
 
+    /**
+     *  Check the contact form 7 form on save for any dm_ fields and create them on the available address book if there is one.
+     */
+    
     public function filter_cf7_fields_on_save(){
 
         $this->initialise_settings();
@@ -51,14 +55,13 @@ class N2DMCF7_Form_Handler {
             return;
 
         $this->check_posted_form_for_dm_fields();
-        
-        $this->compare_field_arrays();
 
 
     }
+    
 
     public function check_posted_form_for_dm_fields(){
-        
+
         foreach ($_POST as $key => $value) {
             if($key == 'wpcf7-form'){
                 $form = $value;
@@ -84,7 +87,7 @@ class N2DMCF7_Form_Handler {
                     $string = substr($form, $start, 40);
                     if(strpos($string, "dm_") !== false){
                         $words = explode(" ", $string);
-                        // if the substring contacts "dm_" the word directly after the [ is the type
+                        // if the substring contains "dm_" the word directly after the [ is the type
                         // the second word is the field name
                         $type = substr($words[0], 1);
                         if(strpos($words[1], "]") !== false){
@@ -101,6 +104,7 @@ class N2DMCF7_Form_Handler {
                     }
                 }
 
+                $this->compare_field_arrays();
                 break;
             }
         }
@@ -111,11 +115,11 @@ class N2DMCF7_Form_Handler {
 
         $new_field_keys = array();
 
-        $existig_fields = $this->dm_client->listDataFields();
+        $existing_fields = $this->dm_client->listDataFields();
         $existing_field_names = array();
 
-        for ($i=0; $i < count($existig_fields) ; $i++) { 
-            $existing_field_names[] = $existig_fields[$i]->Name;
+        for ($i=0; $i < count($existing_fields) ; $i++) { 
+            $existing_field_names[] = $existing_fields[$i]->Name;
         }
 
         if(count($this->field_type_name_array) > 0){ 
@@ -128,11 +132,11 @@ class N2DMCF7_Form_Handler {
                     $value = strtoupper($value[1]);
                     $value = str_replace("-", "_", $value);
 
-                    $key = $this->sanitise_field_types($key, $value);
-                    
+                    $key = $this->sanitise_field_types($key);
+
                     // if the value is NOT inside the existing fields array, create a new field on dotmailer
                     if(!in_array($value, $existing_field_names)){
-                        
+
                         $this->dm_client->AddDataField($value, $key);
                     }
                 }
@@ -140,14 +144,13 @@ class N2DMCF7_Form_Handler {
         }
     }
 
-    public function sanitise_field_types($type, $value){
+    public function sanitise_field_types($type){
         switch ($type){
             case "text":
                 $datatype = "String";
                 break;
             case "date":
                 $datatype = "Date";
-                $value = date("Y-m-d", strtotime($value));
                 break;
             case "number":
                 $datatype = "Numeric";
@@ -157,11 +160,6 @@ class N2DMCF7_Form_Handler {
                 break;
             case "acceptance":
                 $datatype = "Boolean";
-                if ($value = "FALSE") {
-                    $value = 0;
-                } else {
-                    $value = 1;
-                }
                 break;
             default:
                 $datatype = 'String';
@@ -209,26 +207,26 @@ class N2DMCF7_Form_Handler {
         $xsd_value; // we'll use the get_xsd_value function to return the xsd value for the field type
         $fields_array = array();
 
-
         // check for the address book and email address (mandatory fields)
         foreach ($_POST as $k => $v) {
             if(strpos($k, "dm_") !== false){
                 if(strpos($k, 'addressbook') !== false){
                     $addressbook = $v;
+                    continue;
                 }
                 elseif(strpos($k, 'emailaddress') !== false){
                     $email = $v;
+                    continue;
                 }
                 else{
                    $fields_array[][$k] = $v; 
                 }
             }
         }
-        _log($fields_array);
         $datafields = array();
 
         // get existing fields to match new fields to
-        $existig_fields = $this->dm_client->listDataFields();
+        $existing_fields = $this->dm_client->listDataFields();
 
         //Loop through all other dm_ fields
         foreach ($fields_array as $dm_field) {
@@ -236,8 +234,7 @@ class N2DMCF7_Form_Handler {
                 $key = explode("dm_", $key);
                 $key = strtoupper(rtrim($key[1], ']'));
                 $key = str_replace("-", "_", $key);
-
-                foreach ($existig_fields as $data_field) {
+                foreach ($existing_fields as $data_field) {
                     if($key == $data_field->Name){
 
                         $field_type = strtolower($data_field->Type);
@@ -251,7 +248,7 @@ class N2DMCF7_Form_Handler {
                     
                         $keys[] = $key;
                         $values[] = $value;
-                        continue;
+                        break;
                     }
                 }
                 
@@ -259,6 +256,7 @@ class N2DMCF7_Form_Handler {
         }
 
         $datafields = array('Keys' => $keys, 'Values' => $values);
+        _log($datafields);
 
         $this->dm_client->AddContactToAddressBook($email, $addressbook, $datafields);
         

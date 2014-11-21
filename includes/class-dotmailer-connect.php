@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-class DotMailerConnect {
+class N2CF7_DotMailerConnect {
 
     public $request_url = 'http://apiconnector.com/api.asmx?WSDL';
     public $username;
