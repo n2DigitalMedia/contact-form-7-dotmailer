@@ -202,7 +202,8 @@ class N2DMCF7_Form_Handler {
 
         $keys = array(); // array of all keys
         $values = array(); // array of all values
-        
+        $has_dm = false; // Flag for checking if CF has any fields with dm_ prefix
+
         $field_type; // we'll use this to get the field type from the existing fields
         $xsd_value; // we'll use the get_xsd_value function to return the xsd value for the field type
         $fields_array = array();
@@ -210,6 +211,8 @@ class N2DMCF7_Form_Handler {
         // check for the address book and email address (mandatory fields)
         foreach ($_POST as $k => $v) {
             if(strpos($k, "dm_") !== false){
+                if (!$has_dm) $has_dm = true;
+
                 if(strpos($k, 'addressbook') !== false){
                     $addressbook = $v;
                     continue;
@@ -257,9 +260,9 @@ class N2DMCF7_Form_Handler {
 
         $datafields = array('Keys' => $keys, 'Values' => $values);
         _log($datafields);
-
-        $this->dm_client->AddContactToAddressBook($email, $addressbook, $datafields);
-        
+        if ($has_dm) {
+            $this->dm_client->AddContactToAddressBook( $email, $addressbook, $datafields );
+        }
     }
 }
 
