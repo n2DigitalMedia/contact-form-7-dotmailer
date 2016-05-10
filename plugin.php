@@ -236,12 +236,6 @@ final class DMCF7PLUGIN {
 			'n2dmcf7_dotmailer_addressbooks',	// Callback Function (Required)
 			'n2dmcf7-dotmailer-settings',		// Page (Required)
 			'n2dmcf7_dotmailer_settings'		// Section (Optional)
-			// array(														// Args (Optional)
-			// 	'id'	=> 'dotmailer_addressbooks',
-			// 	'name' 	=> 'n2dmcf7_dotmailer_settings[dotmailer_addressbooks]',
-			// 	'class' => 'medium-text'
-			// 	//'value' => isset($dm_settings["dotmailer_addressbooks"]
-			// 	)
 		);
 
 		/**
