@@ -259,7 +259,7 @@ class N2DMCF7_Form_Handler {
         }
 
         $datafields = array('Keys' => $keys, 'Values' => $values);
-        _log($datafields);
+
         if ($has_dm) {
             $this->dm_client->AddContactToAddressBook( $email, $addressbook, $datafields );
         }
