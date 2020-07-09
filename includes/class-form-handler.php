@@ -256,6 +256,11 @@ class N2DMCF7_Form_Handler {
 							}
                         }
 
+                        while ( is_array($value) )
+                        {
+                        	$value = implode(',', $value);
+                        }
+
                         $xsd_value = $this->get_xsd_value($field_type);
                         
                         $value = new SoapVar($value, $xsd_value, $field_type, "http://www.w3.org/2001/XMLSchema");
