@@ -244,6 +244,17 @@ class N2DMCF7_Form_Handler {
                         if($field_type == 'numeric'){
                             $field_type = 'int';
                         }
+                        if($field_type == 'boolean'){
+							$field_type = 'string';
+							if ( ! $value || strtolower($value) == 'no' )
+							{
+								$value = 'No';
+							}
+							else
+							{
+								$value = 'Yes';
+							}
+                        }
 
                         $xsd_value = $this->get_xsd_value($field_type);
                         
