@@ -245,15 +245,13 @@ class N2DMCF7_Form_Handler {
                             $field_type = 'int';
                         }
                         if($field_type == 'boolean'){
-							$field_type = 'string';
-							if ( ! $value || strtolower($value) == 'no' )
-							{
-								$value = 'No';
-							}
-							else
-							{
-								$value = 'Yes';
-							}
+                            $field_type = 'string';
+                            if ( ! $value || strtolower($value) == 'no' ) {
+                                $value = 'No';
+                            }
+                            else {
+                                $value = 'Yes';
+                            }
                         }
 
                         while ( is_array($value) )
